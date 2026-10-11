@@ -1,7 +1,7 @@
-import os
+import json
 from functools import lru_cache
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -29,18 +29,20 @@ class Settings(BaseSettings):
     YOUTUBE_CLIENT_ID: str = ""
     YOUTUBE_CLIENT_SECRET: str = ""
 
-    CORS_ORIGINS: list[str] = Field(
-        default_factory=lambda: ["http://localhost:3000", "http://localhost:5173"]
-    )
+    # Keep this as a string so both JSON arrays and comma-separated env values work.
+    CORS_ORIGINS: str = '["http://localhost:3000","http://localhost:5173"]'
 
-    @field_validator("CORS_ORIGINS", mode="before")
-    @classmethod
-    def parse_cors_origins(cls, value):
-        # Pydantic Settings normally expects JSON for list-valued env vars.
-        # Also accept a comma-separated string for simpler deployment platforms.
-        if isinstance(value, str) and not value.lstrip().startswith("["):
-            return [origin.strip() for origin in value.split(",") if origin.strip()]
-        return value
+    @property
+    def cors_origins(self) -> list[str]:
+        raw = self.CORS_ORIGINS.strip()
+        if not raw:
+            return []
+        if raw.startswith("["):
+            parsed = json.loads(raw)
+            if not isinstance(parsed, list) or not all(isinstance(item, str) for item in parsed):
+                raise ValueError("CORS_ORIGINS JSON must be a list of strings")
+            return [item.strip() for item in parsed if item.strip()]
+        return [item.strip() for item in raw.split(",") if item.strip()]
 
     @model_validator(mode="after")
     def validate_production_secrets(self):
