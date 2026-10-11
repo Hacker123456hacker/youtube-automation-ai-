@@ -1,139 +1,65 @@
-# YouTube Automation AI 🎬
+# YouTube Automation AI
 
-Complete AI-powered YouTube content automation platform. Generate, edit, and publish videos automatically using GPT-4, ElevenLabs, and YouTube API.
+Starter project for a YouTube automation platform. The repository currently contains a basic FastAPI backend, SQLAlchemy models, a minimal React/Vite frontend, and Docker Compose infrastructure.
 
-## Features ✨
+> **Implementation status:** This is not yet a complete video automation product. Authentication, AI script generation, text-to-speech, video rendering, YouTube OAuth/upload, analytics, and scheduled jobs still need to be implemented and tested. The API routes listed in older versions of this README should not be assumed to exist.
 
-✅ AI Content Generation - GPT-4 powered script writing
-✅ Voice Generation - ElevenLabs text-to-speech
-✅ Video Creation - Automated video generation
-✅ Thumbnail Generation - AI-powered thumbnails
-✅ YouTube Integration - Direct upload to YouTube
-✅ Analytics Dashboard - Real-time metrics
-✅ Content Scheduling - Schedule uploads
-✅ Multi-channel Support - Manage multiple channels
-✅ Task Queue - Celery for background jobs
-✅ Docker Ready - Complete containerization
+## Current stack
 
-## Tech Stack 🛠️
+- Backend: FastAPI, SQLAlchemy, Pydantic Settings
+- Data services: PostgreSQL and Redis (Redis/Celery workers are not yet wired to a generation workflow)
+- Frontend: React, TypeScript, Vite, Tailwind CSS
+- Container development: Docker Compose
 
-### Backend
-- FastAPI - Modern async web framework
-- PostgreSQL - Database
-- SQLAlchemy - ORM
-- Celery - Task queue
-- Redis - Cache & message broker
-- OpenAI - GPT-4 API
-- ElevenLabs - Voice generation
+## Local setup with Docker
 
-### Frontend
-- React 18 - UI framework
-- TypeScript - Type safety
-- Tailwind CSS - Styling
-- Zustand - State management
-- Axios - HTTP client
+1. Install Docker Engine/Desktop and Docker Compose.
+2. Copy the environment template and replace all example secrets:
+   ```bash
+   cp backend/.env.example backend/.env
+   ```
+3. Start the development services:
+   ```bash
+   docker compose up --build
+   ```
+4. Open:
+   - Frontend: http://localhost:3000
+   - Backend: http://localhost:8000
+   - API docs: http://localhost:8000/docs
+   - Liveness check: http://localhost:8000/health
+   - Database readiness: http://localhost:8000/health/ready
 
-### DevOps
-- Docker - Containerization
-- Docker Compose - Orchestration
-- PostgreSQL - Database
-- Redis - Cache
+The compose file uses a development-only database password by default. Override `POSTGRES_PASSWORD` and `SECRET_KEY` before using this outside a local development environment.
 
-## Quick Start 🚀
+## Backend local setup
 
-### Using Docker
-
-```bash
-# Clone repository
-git clone https://github.com/Hacker123456hacker/youtube-automation-ai-.git
-cd youtube-automation-ai-
-
-# Copy environment
-cp backend/.env.example backend/.env
-
-# Update .env with your API keys
-
-# Start all services
-docker-compose up -d
-
-# Access
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:8000
-# API Docs: http://localhost:8000/docs
-```
-
-### Local Development
-
-#### Backend
+Use Python 3.11 in a virtual environment:
 
 ```bash
 cd backend
-python -m venv venv
-source venv/bin/activate
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-#### Frontend
+The backend expects PostgreSQL to be reachable using `DATABASE_URL`. For production, use Alembic migrations instead of relying on automatic table creation.
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+## Environment variables
 
-## API Documentation
+See `backend/.env.example`. Never commit real API keys, OAuth client secrets, or production signing keys. In production set `APP_ENV=production`, set `DEBUG=false`, and configure a strong random `SECRET_KEY`.
 
-Visit http://localhost:8000/docs for interactive API documentation.
+## Roadmap
 
-## Key Endpoints
-
-### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login
-- `POST /api/auth/refresh` - Refresh token
-
-### Content
-- `GET /api/content` - List content
-- `POST /api/content/generate` - Generate content with AI
-- `GET /api/content/{id}` - Get content detail
-
-### YouTube
-- `POST /api/youtube/connect` - Connect YouTube account
-- `GET /api/youtube/channels` - List channels
-- `POST /api/youtube/upload` - Upload video
-
-### Analytics
-- `GET /api/analytics/dashboard` - Dashboard metrics
-
-## Project Structure
-
-```
-youtube-automation-ai-/
-├── backend/
-│   ├── app/
-│   │   ├── api/
-│   │   ├── services/
-│   │   ├── models.py
-│   │   ├── schemas.py
-│   │   ├── main.py
-│   │   └── config.py
-│   ├── requirements.txt
-│   ├── Dockerfile
-│   └── .env.example
-├── frontend/
-│   ├── src/
-│   ├── package.json
-│   ├── vite.config.ts
-│   └── Dockerfile
-├── docker-compose.yml
-└── README.md
-```
+- [ ] Add and test registration/login and authorization
+- [ ] Implement AI topic and script generation
+- [ ] Implement Hindi text-to-speech
+- [ ] Implement licensed-image selection and FFmpeg rendering
+- [ ] Implement YouTube OAuth and resumable upload
+- [ ] Add a durable task queue, daily scheduler, retries, and duplicate prevention
+- [ ] Build a functional dashboard and video download flow
+- [ ] Add migrations, tests, CI, logging, and production deployment documentation
 
 ## License
 
-MIT License
-
----
-
-**Made with ❤️ for YouTube Creators**
+MIT
