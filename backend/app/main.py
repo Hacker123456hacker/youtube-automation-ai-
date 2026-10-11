@@ -8,6 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.config import get_settings
 from app.database import Base, engine
 from app import models  # Register model tables before create_all.
+from app.api.content import router as content_router
 
 settings = get_settings()
 
@@ -22,7 +23,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.APP_NAME,
     description="AI-powered YouTube content automation platform",
-    version="0.2.0",
+    version="0.3.0",
     lifespan=lifespan,
 )
 
@@ -34,14 +35,17 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type"],
 )
 
+app.include_router(content_router)
+
 
 @app.get("/")
 async def root():
     return {
         "message": "Welcome to YouTube Automation AI",
-        "version": "0.2.0",
+        "version": "0.3.0",
         "docs": "/docs",
-        "status": "video generation and YouTube upload are not yet implemented",
+        "implemented": ["health checks", "AI script generation endpoint"],
+        "not_yet_implemented": ["voice generation", "video rendering", "YouTube upload", "daily scheduler"],
     }
 
 
