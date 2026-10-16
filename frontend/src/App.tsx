@@ -41,6 +41,36 @@ export default function App() {
     }
   }
 
+  async function downloadVideo() {
+    if (!result) return
+    setRendering(true)
+    setVideoError('')
+    try {
+      const response = await fetch('/api/video/render', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic: result.topic, title: result.title, script: result.script }),
+      })
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        throw new Error(data.detail || 'Video generation failed. Please try again.')
+      }
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = 'hindi-video.mp4'
+      document.body.appendChild(anchor)
+      anchor.click()
+      anchor.remove()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      setVideoError(err instanceof Error ? err.message : 'Could not generate the video.')
+    } finally {
+      setRendering(false)
+    }
+  }
+
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-10 text-slate-100 sm:px-8">
       <div className="mx-auto max-w-4xl">
