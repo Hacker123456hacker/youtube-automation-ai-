@@ -15,6 +15,8 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [result, setResult] = useState<ScriptResult | null>(null)
+  const [rendering, setRendering] = useState(false)
+  const [videoError, setVideoError] = useState('')
 
   async function generateScript(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -46,7 +48,7 @@ export default function App() {
           <p className="mb-3 text-sm font-semibold uppercase tracking-[0.25em] text-cyan-300">Creator Studio · MVP</p>
           <h1 className="text-4xl font-black tracking-tight sm:text-5xl">YouTube Automation AI</h1>
           <p className="mt-4 max-w-2xl text-lg text-slate-300">
-            Generate a narration-ready video script from a topic. Voice generation, MP4 rendering and YouTube uploads are not connected yet.
+            Generate a Hindi script, narrate it, add topic-related visuals and download a vertical MP4. Automatic YouTube uploads and daily scheduling are still in progress.
           </p>
         </header>
 
@@ -105,6 +107,8 @@ export default function App() {
             </div>
             <p className="mt-3 text-sm text-slate-400">{result.language} · approximately {result.estimated_duration_minutes} minutes</p>
             <pre className="mt-5 whitespace-pre-wrap break-words font-sans leading-7 text-slate-200">{result.script}</pre>
+            <button type="button" disabled={rendering} onClick={downloadVideo} className="mt-6 w-full rounded-xl bg-violet-400 px-5 py-3.5 font-bold text-slate-950 transition hover:bg-violet-300 disabled:cursor-not-allowed disabled:opacity-60">{rendering ? 'आवाज़ और वीडियो बन रहे हैं…' : 'हिंदी आवाज़ + तस्वीरों वाला MP4 डाउनलोड करें'}</button>
+            {videoError && <p role="alert" className="mt-4 rounded-xl border border-rose-700 bg-rose-950/50 p-4 text-rose-200">{videoError}</p>}
           </section>
         )}
 
